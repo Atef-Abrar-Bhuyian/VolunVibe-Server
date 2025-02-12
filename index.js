@@ -102,6 +102,26 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/needVolunteerSort", async (req, res) => {
+      try {
+        const { sortBy = "deadline", order = "asc" } = req.query;
+
+        // Define sorting order (1 for ascending, -1 for descending)
+        const sortOrder = order === "desc" ? -1 : 1;
+
+        // Query database with sorting
+        const result = await needVolunteer
+          .find()
+          .sort({ [sortBy]: sortOrder })
+          .toArray();
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching sorted volunteer posts:", error);
+        res.status(500).send({ message: "Internal server error" });
+      }
+    });
+
     // get all post count for pagination
     app.get("/totalNumberOfPosts", async (req, res) => {
       const count = await needVolunteer.estimatedDocumentCount();
